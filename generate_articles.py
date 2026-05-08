@@ -1,21 +1,25 @@
 import os
 import sys
+import subprocess
 
-# Force the script to look in the current directory for the library
-sys.path.append(os.getcwd())
-
-try:
-    import google.generativeai as genai
-except ImportError:
-    print("Library still not found. Local path:", os.getcwd())
-    sys.exit(1)
+# Force the user-installed packages into the path
+user_base = subprocess.check_output(['python3', '-m', 'site', '--user-site']).decode('utf-8').strip()
+sys.path.append(user_base)
 
 import json
 import random
 import re
 
+try:
+    import google.generativeai as genai
+except ImportError:
+    # Final fallback attempt
+    print(f"Module still not found. Searched in: {sys.path}")
+    sys.exit(1)
+
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel('gemini-1.5-flash')
+
 topics = ["Potomac River levels", "Cacapon River padding", "Sleepy Creek trails", "Appalachian ridge hiking"]
 
 def generate():
