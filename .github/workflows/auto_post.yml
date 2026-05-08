@@ -1,0 +1,33 @@
+name: 3x Daily AI Articles
+on:
+  schedule:
+    # Runs at 09:00, 13:00, and 17:00 UTC
+    - cron: '0 9,13,17 * * *'
+  workflow_dispatch: # Allows you to run it manually for testing
+
+jobs:
+  write-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install google-genai
+
+      - name: Run Generator
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # Use Gemini Secret
+        run: python generate_articles.py
+        
+      - name: Push Changes
+        run: |
+          git config user.name "EdenBot"
+          git config user.email "bot@trailstoeden.com"
+          git add data.js
+          git commit -m "Automated Data Update"
+          git push
