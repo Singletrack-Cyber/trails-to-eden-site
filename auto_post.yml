@@ -24,10 +24,10 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # Use Gemini Secret
         run: python generate_articles.py
         
-      - name: Commit and Push to GitHub
+      - name: Push Changes
         run: |
-          git config --global user.name "EdenBot"
-          git config --global user.email "bot@trailstoeden.com"
-          git add .
-          git commit -m "Automated AI Post: $(date)"
+          git config user.name "EdenBot"
+          git config user.email "bot@trailstoeden.com"
+          git add data.js
+          git commit -m "Automated Data Update"
           git push
