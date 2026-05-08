@@ -1,13 +1,21 @@
 import os
-import google.generativeai as genai
+import sys
+
+# Force the script to look in the current directory for the library
+sys.path.append(os.getcwd())
+
+try:
+    import google.generativeai as genai
+except ImportError:
+    print("Library still not found. Local path:", os.getcwd())
+    sys.exit(1)
+
 import json
 import random
 import re
 
-# 1. Setup - Using the correct library name
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel('gemini-1.5-flash')
-
 topics = ["Potomac River levels", "Cacapon River padding", "Sleepy Creek trails", "Appalachian ridge hiking"]
 
 def generate():
@@ -16,20 +24,14 @@ def generate():
     
     try:
         response = model.generate_content(prompt)
-        # 2. Extract the JSON from the response
         json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
-        
         if json_match:
             data = json_match.group()
-            # 3. Write to data.js - This is what your index.html reads
             with open("data.js", "w", encoding="utf-8") as f:
                 f.write(f"const localArticles = [{data}];")
             print("Successfully updated data.js")
-        else:
-            print("Failed to find JSON in AI response.")
-            
     except Exception as e:
-        print(f"Error during AI generation: {e}")
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     generate()
