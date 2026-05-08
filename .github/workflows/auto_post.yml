@@ -10,12 +10,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install and Run
+      - name: Force Install and Run
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          pip install --target . google-generativeai
-          PYTHONPATH=. python generate_articles.py
+          set -e
+          python3 -m pip install --user google-generativeai
+          export PYTHONUSERBASE=$(python3 -m site --user-base)
+          export PATH=$PATH:$PYTHONUSERBASE/bin
+          export PYTHONPATH=$PYTHONPATH:$PYTHONUSERBASE/lib/python3.10/site-packages
+          python3 generate_articles.py
         
       - name: Push Changes
         run: |
